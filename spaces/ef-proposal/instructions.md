@@ -39,7 +39,6 @@ Tato space obsahuje podrobnou rešerši pokrývající tyto soubory:
 
 ## Co nedělat
 
-- Nedoporučuj Data Annotations pro infrastrukturní konfigurace na doménových entitách
 - Nepoužívej veřejný bezparametrický konstruktor jako jediný konstruktor DDD entity
 - Neinicializuj reference navigace na `= new Blog()` — zakrývá chybějící načtení navigace
 - Nepoužívej expression-bodied kolekce `=> new List<T>()` — vytváří nový seznam při každém přístupu
