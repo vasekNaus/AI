@@ -22,7 +22,7 @@ Owned entity jsou entity typy, které **existují pouze jako navigační vlastno
 ### Konfigurace
 
 ```csharp
-// Konfigurace přes atribut:
+// ✅ Preferovaný přístup — atribut [Owned]:
 [Owned]
 public class StreetAddress
 {
@@ -30,14 +30,14 @@ public class StreetAddress
     public string City { get; set; } = string.Empty;
 }
 
-// Konfigurace přes Fluent API — OwnsOne:
+// Fluent API — nutné pro detailní konfiguraci (column names, FK, klíče OwnsMany):
 modelBuilder.Entity<Order>().OwnsOne(o => o.ShippingAddress, sa =>
 {
     sa.Property(p => p.Street).HasColumnName("ShipsToStreet");
     sa.Property(p => p.City).HasColumnName("ShipsToCity");
 });
 
-// Kolekce owned typů — OwnsMany:
+// Kolekce owned typů — OwnsMany nemá DA alternativu, vždy Fluent API:
 modelBuilder.Entity<Distributor>().OwnsMany(p => p.ShippingCenters, a =>
 {
     a.WithOwner().HasForeignKey("OwnerId");
@@ -62,7 +62,7 @@ Complex types jsou **bez klíče**, mají **value semantics** a lze je sdílet m
 ### Konfigurace
 
 ```csharp
-// Konfigurace přes atribut (MUSÍ být explicitní — neprobíhá discovery konvencemi):
+// ✅ Preferovaný přístup — atribut [ComplexType] (MUSÍ být explicitní — neprobíhá discovery konvencemi):
 [ComplexType]
 public class Address
 {
@@ -72,7 +72,7 @@ public class Address
     public required string PostCode { get; set; }
 }
 
-// Konfigurace přes Fluent API:
+// Fluent API — nutné pro .ToJson(), přejmenování sloupců nebo nullable complex property (EF Core 10+):
 modelBuilder.Entity<Customer>().ComplexProperty(e => e.Address);
 ```
 

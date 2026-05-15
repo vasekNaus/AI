@@ -22,8 +22,15 @@ EF Core podporuje tři strategie mapování dědičnosti. Výchozí a doporučen
 **Schéma:** Jedna tabulka pro celou hierarchii, sloupec diskriminátoru.
 
 ```csharp
-// Výchozí — žádná konfigurace není potřeba, pokud jsou typy registrovány
-// Explicitní konfigurace diskriminátoru:
+// ✅ Preferovaný přístup — Data Annotations (EF Core 8+):
+[Discriminator("blog_type")]
+[DiscriminatorValue("blog_base")]
+public class Blog { /* ... */ }
+
+[DiscriminatorValue("blog_rss")]
+public class RssBlog : Blog { /* ... */ }
+
+// Fluent API — záložní možnost nebo pro pokročilou konfiguraci diskriminátoru:
 modelBuilder.Entity<Blog>()
     .HasDiscriminator<string>("blog_type")
     .HasValue<Blog>("blog_base")

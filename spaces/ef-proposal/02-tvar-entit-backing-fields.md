@@ -89,11 +89,11 @@ EF Core automaticky hledá backing field k property `Url` v tomto pořadí:
 ### Explicitní konfigurace backing field
 
 ```csharp
-// Přes atribut:
+// ✅ Preferovaný přístup — atribut [BackingField]:
 [BackingField(nameof(_validatedUrl))]
 public string Url { get { return _validatedUrl; } }
 
-// Přes Fluent API:
+// Fluent API — záložní možnost (pokud nemáš přímý přístup k třídě entity):
 modelBuilder.Entity<Blog>()
     .Property(b => b.Url)
     .HasField("_validatedUrl")

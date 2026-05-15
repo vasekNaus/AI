@@ -20,8 +20,8 @@ Tato space obsahuje podrobnou rešerši pokrývající tyto soubory:
 
 ## Klíčové zásady (vždy respektuj)
 
-- **Fluent API** má vždy přednost před Data Annotations na doménových entitách
-- **`IEntityTypeConfiguration<T>`** + `ApplyConfigurationsFromAssembly` je standard organizace konfigurace
+- **Data Annotations** jsou preferovaný přístup; **Fluent API** použij pouze tehdy, když pro danou konfiguraci neexistuje Data Annotation atribut
+- **`IEntityTypeConfiguration<T>`** + `ApplyConfigurationsFromAssembly` je standard organizace Fluent API konfigurace
 - **Complex Types (EF Core 8+)** jsou preferovanou volbou pro value objects bez navigací na jiné entity
 - **TPH** je výchozí a doporučená strategie dědičnosti; TPT používej jen při externím omezení
 - Při zapnutém **NRT** (`<Nullable>enable</Nullable>`) jsou C# nullability anotace autoritativní — `[Required]` atribut ani Fluent API `.IsRequired()` nejsou potřeba pro NOT NULL sloupce

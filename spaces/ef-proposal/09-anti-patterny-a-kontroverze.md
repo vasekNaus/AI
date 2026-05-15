@@ -11,7 +11,7 @@
 |---|---|---|
 | `public List<T>` navigační kolekce | Umožňuje obejít metody aggregate root | `private readonly List<T>` + `IReadOnlyCollection<T>` |
 | Veřejný bezparametrický konstruktor na DDD entitě | Umožňuje vytvoření v neplatném stavu | Protected/private ctor pro EF + pojmenovaný public konstruktor |
-| Data Annotations na doménových entitách | Kontaminuje doménový model infrastrukturními obavami | Výhradně Fluent API |
+| Fluent API pro konfiguraci dostupnou přes Data Annotations | Zbytečná ceremony — konfigurace oddělena od entity, vyžaduje extra třídu | Použít příslušný Data Annotation atribut (`[Table]`, `[Column]`, `[MaxLength]`, `[BackingField]` apod.) |
 | Anemic domain model (gettery/settery pro vše) | Logika fragmentována do service vrstvy | Metody a chování na entitách (pro komplexní domény) |
 | Inicializace reference navigace na non-null default: `= new Blog()` | Zakrývá chybějící načtení navigace | `null!` nebo `?? throw` nebo `Customer?` |
 | Expression-bodied kolekce `=> new List<T>()` | Vytváří nový seznam při každém přístupu | `{ get; } = new List<T>()` nebo backing field |
