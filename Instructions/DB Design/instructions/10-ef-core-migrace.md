@@ -18,7 +18,7 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
         builder.HasKey(t => t.Id);
 
         builder.Property(t => t.Title)
-            .IsRequired()
+            .IsRequired()  // ⚠️ S NRT enabled (<Nullable>enable</Nullable>) redundantní pro non-nullable string — EF Core odvozuje NOT NULL z C# nullability anotace
             .HasMaxLength(300);
 
         builder.Property(t => t.CreatedAt)
@@ -27,8 +27,7 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
 
         // FK s legacy pojmenováním (podtržítko!)
         builder.Property(t => t.CustomerId)
-            .HasColumnName("Customer_Id")  // ⚠️ povinné pro legacy sloupce!
-            .IsRequired();
+            .HasColumnName("Customer_Id");  // ⚠️ povinné pro legacy sloupce! .IsRequired() je s NRT redundantní
 
         builder.HasOne(t => t.Customer)
             .WithMany(c => c.Tickets)
@@ -117,9 +116,12 @@ public class ApplicationUser : IdentityUser<int>
     public bool    IsActive   { get; set; } = true;
     public int?    Customer_Id { get; set; }
 
-    [Timestamp]  // rowversion → EF optimistická souběžnost
+    // rowversion → EF optimistická souběžnost (konfigurovat přes Fluent API, ne [Timestamp])
     public byte[] Version { get; set; } = [];
 }
+
+// Konfigurace rowversion přes Fluent API (preferováno před [Timestamp] atributem):
+builder.Property(u => u.Version).IsRowVersion().HasColumnName("Version");
 
 // ⚠️ Login vs. UserName:
 // UserName = Identity standard (normalizace, validace hesla)
@@ -189,7 +191,7 @@ builder.Entity<Ticket>()
     .Property(t => t.Version)
     .IsRowVersion()
     .HasColumnName("Version");
-// Nebo přes atribut: [Timestamp] public byte[] Version { get; set; }
+// Poznámka: [Timestamp] atribut je ekvivalent, ale preferujeme Fluent API (pravidlo: Data Annotations nekontaminují doménový model)
 ```
 
 ### XML sloupec jako string
@@ -221,11 +223,13 @@ public class File
     public int  Id     { get; set; }
     public Guid FileId { get; set; }  // ROWGUIDCOL
 
-    [NotMapped]  // FILESTREAM — načítat samostatně raw SQL nebo file storage
+    // FILESTREAM — načítat samostatně raw SQL nebo file storage
+    // [NotMapped] záměrně přesunuto do Fluent API (viz konfigurace níže)
     public byte[]? Data { get; set; }
 }
 
 builder.Entity<File>()
+    .Ignore(f => f.Data)                  // nahrazuje [NotMapped]
     .Property(f => f.FileId)
     .HasDefaultValueSql("NEWID()");
 ```

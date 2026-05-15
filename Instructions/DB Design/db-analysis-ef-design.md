@@ -346,8 +346,8 @@ modelBuilder.Entity<Customer>()
 ```csharp
 public class ApplicationUser : IdentityUser<int>
 {
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
     public int? Customer_Id { get; set; }
     public bool IsGroup { get; set; }
     public bool IsActive { get; set; }
@@ -357,12 +357,16 @@ public class ApplicationUser : IdentityUser<int>
     public string? Phone { get; set; }
     public string? Mobil { get; set; }
     // ...
-    [Timestamp]
-    public byte[] Version { get; set; } // timestamp → RowVersion
+    public byte[] Version { get; set; } = [];   // rowversion → konfigurovat přes Fluent API: .IsRowVersion()
 }
 ```
 
 > `dbo.UserRole` má navíc `Customer_Id` – tenant-scoped role. Vyžaduje vlastní `IdentityUserRole<int>` subclass.
+
+> Konfigurace rowversion přes Fluent API (ne `[Timestamp]` atribut):
+> ```csharp
+> builder.Property(u => u.Version).IsRowVersion().HasColumnName("Version");
+> ```
 
 **ApolloSmartFleet** – standardní Identity, čisté rozšíření:
 
@@ -370,9 +374,9 @@ public class ApplicationUser : IdentityUser<int>
 public class ApplicationUser : IdentityUser<string>
 {
     public bool IsActive { get; set; }
-    public string Language { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
+    public string Language { get; set; } = string.Empty;
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
 }
 ```
 
@@ -401,16 +405,16 @@ public class Address {
 public class File {
     public int Id { get; set; }
     public Guid FileId { get; set; }
-    [NotMapped] // nebo načítat jen explicitně
-    public byte[]? Data { get; set; }
-    public string Name { get; set; }
-    public string ContentType { get; set; }
+    public byte[]? Data { get; set; }               // [NotMapped] → Fluent API: builder.Ignore(f => f.Data)
+    public required string Name { get; set; }
+    public required string ContentType { get; set; }
 }
 
 // Fluent API
 modelBuilder.Entity<File>()
+    .Ignore(f => f.Data)                // nahrazuje [NotMapped]
     .Property(f => f.FileId)
-    .ValueGeneratedOnAdd(); // ROWGUIDCOL
+    .ValueGeneratedOnAdd();             // ROWGUIDCOL
 ```
 
 ---
@@ -490,7 +494,7 @@ Používají: `acc.HourlyRate`, `data.DepotVehicle`, `data.VehicleConfiguration`
 ```csharp
 public class WorkerJob {
     public Guid Id { get; set; } // uniqueidentifier PK
-    public string Status { get; set; }
+    public required string Status { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime? DateStarted { get; set; }
     public DateTime? DateCompleted { get; set; }
@@ -573,7 +577,7 @@ public abstract class Activity
 {
     public int Id { get; set; }
     public int UserId { get; set; }
-    public User User { get; set; }
+    public User User { get; set; } = null!;
     public DateOnly Date { get; set; }
     public DateTime SysDate { get; set; }
     public bool IsClosed { get; set; }
@@ -589,7 +593,8 @@ public class Work : Activity
     public bool IsHomeOffice { get; set; }
     public int? DepartmentId { get; set; }
     public Department? Department { get; set; }
-    public ICollection<WorkDetail> WorkDetails { get; set; } = [];
+    private readonly List<WorkDetail> _workDetails = [];
+    public IReadOnlyCollection<WorkDetail> WorkDetails => _workDetails;
 }
 
 public class Holiday : Activity
@@ -611,7 +616,7 @@ public class WorkShop : Activity
 {
     public TimeOnly From { get; set; }
     public TimeOnly To { get; set; }
-    public string Name { get; set; }
+    public required string Name { get; set; }
 }
 
 // EF konfigurace
