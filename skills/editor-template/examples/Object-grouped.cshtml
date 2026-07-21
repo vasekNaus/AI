@@ -1,0 +1,89 @@
+@* examples/Object-grouped.cshtml *@
+@* Pokročilá verze Object.cshtml s podporou [Display(GroupName="...")] *@
+@* Skupiny se renderují jako collapsible <details> elementy *@
+@* Zdroj: Prezentation/03-02_EditorTemplates/Pages/EditorTemplates/Object.cshtml *@
+
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+@using System.ComponentModel.DataAnnotations
+@{
+    this.Layout = string.Empty;
+
+    if (ViewData.TemplateInfo.TemplateDepth == 1)
+    {
+        // Top-level: renderuj přímo
+        RenderGroupedProperties(ViewData.ModelMetadata.Properties);
+    }
+    else
+    {
+        // Zanořený objekt: obal do vizuálního containeru
+        <div class="editor-complex-field">
+            @{ RenderGroupedProperties(ViewData.ModelMetadata.Properties); }
+        </div>
+    }
+
+    void RenderGroupedProperties(ModelPropertyCollection properties)
+    {
+        // Seskup vlastnosti dle [Display(GroupName="...")]
+        var groupedProperties =
+            from mp in properties
+            where mp.ShowForEdit
+            orderby mp.Order
+            let p = mp.ContainerType?.GetProperty(mp.PropertyName ?? string.Empty)
+            let a = p?.GetCustomAttributes(true).OfType<DisplayAttribute>().FirstOrDefault()
+            group p by a?.GroupName into g
+            select new { Name = g.Key, PropertyNames = g.Select(x => x?.Name) };
+
+        foreach (var group in groupedProperties)
+        {
+            var propsInGroup = properties.Where(p => group.PropertyNames.Contains(p.PropertyName));
+
+            if (string.IsNullOrEmpty(group.Name))
+            {
+                // Bez skupiny → renderuj přímo
+                RenderProperties(propsInGroup);
+            }
+            else
+            {
+                // Se skupinou → collapsible <details> element
+                <details>
+                    <summary>@group.Name</summary>
+                    @{ RenderProperties(propsInGroup); }
+                </details>
+            }
+        }
+    }
+
+    void RenderProperties(IEnumerable<ModelMetadata> properties)
+    {
+        foreach (var prop in properties.Where(p => p.ShowForEdit).OrderBy(p => p.Order))
+        {
+            if (prop.IsComplexType)
+            {
+                <div class="editor-label">@Html.Label(prop.PropertyName)</div>
+                @Html.Editor(prop.PropertyName)
+            }
+            else if (prop.HideSurroundingHtml)
+            {
+                // [HiddenInput(DisplayValue=false)] → bez wrapperu
+                @Html.Editor(prop.PropertyName)
+            }
+            else if (prop.ModelType.Equals(typeof(bool)))
+            {
+                // Boolean: checkbox + label vedle sebe
+                <div class="editor-field-checkbox">
+                    @Html.Editor(prop.PropertyName) @Html.Label(prop.PropertyName)
+                    @Html.ValidationMessage(prop.PropertyName)
+                </div>
+            }
+            else
+            {
+                // Standardní pole
+                <div class="editor-label">@Html.Label(prop.PropertyName)</div>
+                <div class="editor-field">
+                    @Html.Editor(prop.PropertyName)
+                    @Html.ValidationMessage(prop.PropertyName)
+                </div>
+            }
+        }
+    }
+}

@@ -1,0 +1,20 @@
+﻿@page
+@model Demo.DynamicUI.Pages.IndexModel
+<html>
+<head>
+    <title>Index</title>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="~/Content/Styles/Site.css" asp-append-version="true" />
+</head>
+<body>
+    <h1>Demo Form</h1>
+    <form method="post">
+        <p>This form was generated automatically from metadata.</p>
+        @Html.EditorFor(m => Model.Input)
+        <footer>
+            <div asp-validation-summary="All"></div>
+            <input type="submit" value="Submit" />
+        </footer>
+    </form>
+</body>
+</html>

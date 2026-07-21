@@ -1,0 +1,9 @@
+﻿@model Demo.DynamicUI.Pages.IndexModel.StreetModel
+@{
+    // Set layout to empty to avoid conflict with parent layout
+    this.Layout = string.Empty;
+}
+<input asp-for="@Model.StreetName" class="hasextra" />
+<input asp-for="@Model.StreetNumber" class="isextra" />
+<span asp-validation-for="@Model.StreetName"></span>
+<span asp-validation-for="@Model.StreetNumber"></span>

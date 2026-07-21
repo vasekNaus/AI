@@ -1,0 +1,24 @@
+@* examples/AdminCreate.cshtml *@
+@* Kompletní Create admin stránka využívající EditorFor *@
+@* Nahraďte MyApp.Pages.Admin.Items.CreateModel za svůj namespace *@
+
+@page
+@model MyApp.Pages.Admin.Items.CreateModel
+@{
+    this.ViewBag.Title = "Vytvořit položku";
+}
+
+<h1>@this.ViewBag.Title</h1>
+
+<form method="post">
+    @Html.EditorFor(m => this.Model.Input)
+    <footer>
+        <div asp-validation-summary="All"></div>
+        <input type="submit" value="Uložit" />
+        <a asp-page="Index" class="button secondary">Zrušit</a>
+    </footer>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

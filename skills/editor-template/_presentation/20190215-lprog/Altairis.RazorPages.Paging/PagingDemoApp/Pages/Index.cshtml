@@ -1,0 +1,40 @@
+﻿@page "{pageNumber:int:min(1)=1}"
+@model IndexModel
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="~/Content/Styles.min.css" asp-append-version="true" />
+</head>
+<body>
+    <h1>Stránkovaná data pomocí RCL</h1>
+    <table class="grid">
+        <thead>
+            <tr>
+                <th style="width: 3ex">ID</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in this.Model.Data) {
+                <tr>
+                    <td class="r"><code>@item.Id</code></td>
+                    <td>@item.Name</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="2">
+                    <vc:pager model="Model.Paging"></vc:pager>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+    <footer>
+        &copy; Michal A. Valášek - Altairis, 2019 | <a href="https://www.altair.blog">www.altair.blog</a>
+</footer>
+</body>
+</html>

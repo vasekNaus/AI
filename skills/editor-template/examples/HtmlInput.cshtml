@@ -1,0 +1,50 @@
+@* examples/HtmlInput.cshtml *@
+@* Sdílená base šablona pro všechny <input> elementy *@
+@* Ostatní šablony nastavují ViewData["type"] a delegují sem přes <partial> *@
+@* Zdroj: Altairis.ReP.Web/Pages/EditorTemplates/HtmlInput.cshtml *@
+
+@{
+    this.Layout = "_Layout.cshtml";
+
+    var htmlAttributes = new {
+        @class = string.Join(" ", "textbox", ViewData["additionalCssClass"]),
+        type = ViewData["type"],
+        placeholder = ViewData.ModelMetadata.Placeholder,
+    };
+}
+@Html.TextBox("", ViewData.TemplateInfo.FormattedModelValue, htmlAttributes)
+
+@* ═══════════════════════════════════════════════════════════════════════
+   Příklady šablon delegujících na HtmlInput.cshtml:
+
+   String.cshtml:
+       @{ ViewData["type"] = "text"; }
+       <partial name="HtmlInput.cshtml" />
+
+   EmailAddress.cshtml:
+       @{ ViewData["type"] = "email"; }
+       <partial name="HtmlInput.cshtml" />
+
+   PhoneNumber.cshtml:
+       @{ ViewData["type"] = "tel"; }
+       <partial name="HtmlInput.cshtml" />
+
+   Url.cshtml:
+       @{ ViewData["type"] = "url"; }
+       <partial name="HtmlInput.cshtml" />
+
+   Color.cshtml:
+       @{ ViewData["type"] = "color"; }
+       <partial name="HtmlInput.cshtml" />
+
+   Upload.cshtml:
+       @{ ViewData["type"] = "file"; }
+       <partial name="HtmlInput.cshtml" />
+
+   Number.cshtml:
+       @{ ViewData["type"] = "number"; }
+       <partial name="HtmlInput.cshtml" />
+
+   Int32.cshtml (delegates to Number):
+       <partial name="Number.cshtml" />
+   ═══════════════════════════════════════════════════════════════════════ *@

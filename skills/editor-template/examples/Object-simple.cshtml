@@ -1,0 +1,55 @@
+@* examples/Object-simple.cshtml *@
+@* Jednoduchá verze Object.cshtml – plochá struktura bez groupování *@
+@* Umístit do: Pages/Shared/EditorTemplates/Object.cshtml (nebo Pages/EditorTemplates/Object.cshtml) *@
+@* Zdroj: Altairis.ReP.Web/Pages/EditorTemplates/Object.cshtml *@
+
+@{
+    this.Layout = "_Layout.cshtml";   // EditorTemplates/_Layout.cshtml obsahuje pouze @RenderBody()
+
+    foreach (var prop in ViewData.ModelMetadata.Properties.Where(metadata => metadata.ShowForEdit))
+    {
+        if (prop.IsComplexType)
+        {
+            // Vnořený komplexní objekt → fieldset s rekurzivním voláním
+            <fieldset>
+                <legend>@prop.GetDisplayName()</legend>
+                @if (!string.IsNullOrWhiteSpace(prop.Description))
+                {
+                    <p class="description">@prop.Description</p>
+                }
+                @Html.Editor(prop.PropertyName)
+            </fieldset>
+        }
+        else if (prop.HideSurroundingHtml)
+        {
+            // [HiddenInput(DisplayValue=false)] → bez wrapperu, pouze hidden input
+            @Html.Editor(prop.PropertyName)
+        }
+        else if (prop.ModelType.Equals(typeof(bool)))
+        {
+            // Boolean: checkbox VLEVO od labelu
+            <p>
+                @Html.Editor(prop.PropertyName)
+                @Html.Label(prop.PropertyName)
+                @if (!string.IsNullOrWhiteSpace(prop.Description))
+                {
+                    <span class="description">@prop.Description</span>
+                }
+                @Html.ValidationMessage(prop.PropertyName)
+            </p>
+        }
+        else
+        {
+            // Standardní pole: label nad inputem
+            <p>
+                @Html.Label(prop.PropertyName, prop.GetDisplayName() + ":")<br />
+                @if (!string.IsNullOrWhiteSpace(prop.Description))
+                {
+                    <span class="description">@prop.Description</span>
+                }
+                @Html.Editor(prop.PropertyName)
+                @Html.ValidationMessage(prop.PropertyName)
+            </p>
+        }
+    }
+}

@@ -1,0 +1,5 @@
+﻿@{
+    // Set layout to empty to avoid conflict with parent layout
+    this.Layout = string.Empty;
+}
+@Html.TextBox(string.Empty, ViewData.TemplateInfo.FormattedModelValue, new { @class = "text-box single-line short" })
